@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Cookies from "js-cookie";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 export type Servicio = {
   id_servicio: string;
@@ -35,32 +37,51 @@ export default function EditServicioForm({
   onCancel,
 }: EditServicioFormProps) {
   const [editedServicio, setEditedServicio] = useState(servicio);
+  const { toast } = useToast();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setEditedServicio((prev) => ({ ...prev, [name]: value }));
+    setEditedServicio((prev) => ({
+      ...prev,
+      [name]: Number.isInteger(value) ? value.toString() : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const token = Cookies.get("token");
+      if (!token) {
+        throw new Error("Token no encontrado");
+      }
+
       const res = await fetch(
-        `http://localhost:4000/servicios/${servicio.id_servicio}`,
+        `http://localhost:4000/api/servicios/${servicio.id_servicio}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(editedServicio),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Añadir el token como Bearer
+          },
+          body: JSON.stringify({
+            ...editedServicio,
+            precio: editedServicio.precio.toString(),
+          }),
         }
       );
+
       if (res.ok) {
+        toast({
+          title: "Servicio editado",
+        });
         onUpdate(editedServicio);
       } else {
-        console.error("Error updating service");
+        console.error("Error al actualizar el servicio");
       }
     } catch (error) {
-      console.error("Error updating service:", error);
+      console.error("Error al actualizar el servicio:", error);
     }
   };
 
@@ -92,6 +113,7 @@ export default function EditServicioForm({
                 id="precio"
                 name="precio"
                 type="number"
+                min={10000}
                 value={editedServicio.precio}
                 onChange={handleChange}
                 className="col-span-3"

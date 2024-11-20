@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Cookies from "js-cookie";
 import {
   Card,
   CardContent,
@@ -12,7 +13,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, UserIcon, PawPrintIcon } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { useToast } from "@/hooks/use-toast";
 
 type CitaEstado = "programada" | "completada" | "cancelada";
 
@@ -37,14 +40,22 @@ type Cita = {
 };
 
 export default function CitasList({ initialCitas }: { initialCitas: Cita[] }) {
+  const { toast } = useToast();
+
   const [citas, setCitas] = useState<Cita[]>(initialCitas);
 
   const updateCitaEstado = async (id_cita: string, nuevoEstado: CitaEstado) => {
     try {
-      const res = await fetch(`/api/citas/${id_cita}`, {
+      const token = Cookies.get("token"); // Obtener el token desde las cookies
+      if (!token) {
+        throw new Error("No se encontró el token de autorización");
+      }
+
+      const res = await fetch(`http://localhost:4000/api/citas/${id_cita}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Agregar el token al encabezado
         },
         body: JSON.stringify({ estado: nuevoEstado }),
       });
@@ -73,6 +84,10 @@ export default function CitasList({ initialCitas }: { initialCitas: Cita[] }) {
     }
   };
 
+  if (citas.length < 1) {
+    return <div>No hay citas en el momento.</div>;
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {citas.map((cita) => (
@@ -94,7 +109,9 @@ export default function CitasList({ initialCitas }: { initialCitas: Cita[] }) {
             </CardTitle>
             <CardDescription>
               <CalendarIcon className="inline-block mr-2" size={16} />
-              {new Date(cita.fecha_creacion).toLocaleString()}
+              {format(new Date(cita.fecha_creacion), "dd/MM/yyyy, hh:mm:ss a", {
+                locale: es,
+              })}
             </CardDescription>
           </CardHeader>
           <CardContent>

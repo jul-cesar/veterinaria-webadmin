@@ -6,6 +6,7 @@ import { GalleryVerticalEnd } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarHeader,
   SidebarMenu,
@@ -17,6 +18,8 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import useUserData from "@/hooks/useUserData";
+import { Button } from "./ui/button";
+import { clearCookies } from "@/auth/saveInfoToCookies";
 
 const data = {
   navMain: [
@@ -87,6 +90,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <Button onClick={() => clearCookies()}>Cerrar sesion</Button>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );

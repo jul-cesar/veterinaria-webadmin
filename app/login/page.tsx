@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 function LoginForm() {
   const router = useRouter();
@@ -48,7 +48,7 @@ function LoginForm() {
       saveInfoToCookies(data.token, data.data);
 
       setSuccess(true);
-      router.push("/admin");
+      router.push("/admin/servicios");
     } catch (err: any) {
       console.error(err.message);
     } finally {

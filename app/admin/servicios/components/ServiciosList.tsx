@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/popover";
 import { MoreVertical, Edit, Trash } from "lucide-react";
 import EditServicioForm, { Servicio } from "./EditServicioForm";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ServiciosList({
   initialServicios,
@@ -26,6 +27,7 @@ export default function ServiciosList({
 }) {
   const [servicios, setServicios] = useState(initialServicios);
   const [editingServicio, setEditingServicio] = useState<Servicio | null>(null);
+  const { toast } = useToast();
 
   const handleEdit = (servicio: Servicio) => {
     setEditingServicio(servicio);
@@ -47,6 +49,9 @@ export default function ServiciosList({
       });
 
       if (res.ok) {
+        toast({
+          title: "Servicio eliminado correctamente",
+        });
         setServicios(servicios.filter((s) => s.id_servicio !== id));
       } else {
         console.error("Error al eliminar el servicio");
@@ -64,6 +69,10 @@ export default function ServiciosList({
     );
     setEditingServicio(null);
   };
+
+  if (servicios.length < 1) {
+    return <div>No hay servicios disponibles por el momento</div>;
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
