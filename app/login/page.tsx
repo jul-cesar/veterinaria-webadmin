@@ -23,7 +23,7 @@ function LoginForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const handleForm = async (e: any) => {
+  const handleForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess(false);
