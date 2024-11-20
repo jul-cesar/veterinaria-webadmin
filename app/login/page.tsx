@@ -49,7 +49,7 @@ function LoginForm() {
 
       setSuccess(true);
       router.push("/admin/servicios");
-    } catch (err: any) {
+    } catch (err) {
       console.error(err.message);
     } finally {
       setLoading(false);
